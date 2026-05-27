@@ -99,13 +99,11 @@ Classification predicts **discrete categories** instead of numerical values.
 Naive Bayes is a probabilistic classifier based on Bayes' theorem with a "naive" assumption of conditional independence among predictors.
 
 **Bayes' Theorem:**
-\[
-P(Y=i \mid X_1, \dots, X_p) = \frac{P(Y=i) \prod_{j=1}^{p} P(X_j \mid Y=i)}{\sum_{k} P(Y=k) \prod_{j=1}^{p} P(X_j \mid Y=k)}
-\]
+$$P(Y=i \mid X_1, \dots, X_p) = \frac{P(Y=i) \prod_{j=1}^{p} P(X_j \mid Y=i)}{\sum_{k} P(Y=k) \prod_{j=1}^{p} P(X_j \mid Y=k)}$$
 
 **Algorithm:**
-1. For each class \(i\), estimate individual conditional probabilities \(P(X_j \mid Y=i)\) from training data.
-2. Multiply these probabilities together, along with the prior \(P(Y=i)\).
+1. For each class $i$, estimate individual conditional probabilities $P(X_j \mid Y=i)$ from training data.
+2. Multiply these probabilities together, along with the prior $P(Y=i)$.
 3. Normalise across all classes to get posterior probabilities.
 4. Assign the record to the class with the highest posterior probability.
 
@@ -115,7 +113,7 @@ P(Y=i \mid X_1, \dots, X_p) = \frac{P(Y=i) \prod_{j=1}^{p} P(X_j \mid Y=i)}{\sum
 - Often produces biased probability estimates but good ranking for classification.
 - Despite the unrealistic independence assumption, it performs surprisingly well in practice, especially for text classification and spam detection.
 
-**Laplace Smoothing:** Add a small constant (\(\alpha\)) to counts to avoid zero probabilities when a predictor-category combination is absent in training data.
+**Laplace Smoothing:** Add a small constant ($\alpha$) to counts to avoid zero probabilities when a predictor-category combination is absent in training data.
 
 ```python
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
@@ -127,6 +125,7 @@ model.fit(X_train, y_train)
 # For categorical/text features (multinomial)
 model = MultinomialNB(alpha=1.0)  # alpha = Laplace smoothing
 model.fit(X_train, y_train)
+
 ```
 
 ---
@@ -134,31 +133,37 @@ model.fit(X_train, y_train)
 ### 3. Discriminant Analysis
 
 **Linear Discriminant Analysis (LDA):**
-- Assumes predictors are normally distributed within each class with **equal covariance matrices**.
-- Finds the linear combination of predictors that maximises separation between class means relative to within-class variance.
-- The decision boundary is linear in predictor space.
-- Fisher's Linear Discriminant maximises: \(\frac{SS_{\text{between}}}{SS_{\text{within}}}\).
+
+* Assumes predictors are normally distributed within each class with **equal covariance matrices**.
+* Finds the linear combination of predictors that maximises separation between class means relative to within-class variance.
+* The decision boundary is linear in predictor space.
+* Fisher's Linear Discriminant maximises: $\frac{SS_{\text{between}}}{SS_{\text{within}}}$.
 
 **Quadratic Discriminant Analysis (QDA):**
-- Relaxes the equal covariance assumption; allows class-specific covariance matrices.
-- The decision boundary is quadratic; more flexible but requires more data.
+
+* Relaxes the equal covariance assumption; allows class-specific covariance matrices.
+* The decision boundary is quadratic; more flexible but requires more data.
 
 **Key Terms:**
-- **Covariance matrix:** Measures how predictors vary together; central to LDA/QDA.
-- **Discriminant function:** Linear combination of predictors used for classification.
-- **Mahalanobis distance:** Distance metric accounting for covariance; used in LDA.
+
+* **Covariance matrix:** Measures how predictors vary together; central to LDA/QDA.
+* **Discriminant function:** Linear combination of predictors used for classification.
+* **Mahalanobis distance:** Distance metric accounting for covariance; used in LDA.
 
 **Discriminant Function:**
-\[
-\delta_k(\mathbf{x}) = \mathbf{x}^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k - \frac{1}{2} \boldsymbol{\mu}_k^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k + \log(\pi_k)
-\]
-Assign to class with largest \(\delta_k(\mathbf{x})\).
+
+
+$$\delta_k(\mathbf{x}) = \mathbf{x}^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k - \frac{1}{2} \boldsymbol{\mu}_k^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k + \log(\pi_k)$$
+
+
+Assign to class with largest $\delta_k(\mathbf{x})$.
 
 ```python
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 model = LinearDiscriminantAnalysis()
 model.fit(X_train, y_train)
+
 ```
 
 ---
@@ -167,26 +172,23 @@ model.fit(X_train, y_train)
 
 Despite its name, **logistic regression is a classification algorithm**. It predicts the **probability of class membership**.
 
-**Core Transformation (Logit):** Map probability \(p \in [0, 1]\) to log-odds \(\in (-\infty, +\infty)\):
+**Core Transformation (Logit):** Map probability $p \in [0, 1]$ to log-odds $\in (-\infty, +\infty)$:
 
-\[
-\text{logit}(p) = \log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p
-\]
+$$\text{logit}(p) = \log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
 
 **Inverse (Logistic/Sigmoid Function):**
 
-\[
-P(Y=1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p)}}
-\]
+$$P(Y=1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p)}}$$
 
-**Why Log-Odds?** Probabilities are bounded [0, 1], while log-odds are unbounded (\(-\infty, +\infty\)), making them suitable for linear modelling.
+**Why Log-Odds?** Probabilities are bounded $[0, 1]$, while log-odds are unbounded $(-\infty, +\infty)$, making them suitable for linear modelling.
 
 **Fitting:** Maximum Likelihood Estimation (MLE), not least squares. Uses iterative optimisation (e.g., Newton-Raphson).
 
 **Coefficient Interpretation:**
-- \(\beta_j\) = change in log-odds per unit change in \(X_j\), holding other predictors constant.
-- **Odds Ratio** = \(e^{\beta_j}\) = multiplicative change in odds per unit change in \(X_j\).
-- *Example:* \(\beta = 0.693\) → odds ratio = 2.0 → doubling of odds.
+
+* $\beta_j$ = change in log-odds per unit change in $X_j$, holding other predictors constant.
+* **Odds Ratio** = $e^{\beta_j}$ = multiplicative change in odds per unit change in $X_j$.
+* *Example:* $\beta = 0.693$ → odds ratio = 2.0 → doubling of odds.
 
 **Generalised Linear Model (GLM):** Logistic regression is a GLM with binomial distribution family and logit link function.
 
@@ -202,23 +204,26 @@ coefficients = pd.DataFrame({
     'coef': model.coef_[0],
     'odds_ratio': np.exp(model.coef_[0])
 }).sort_values('coef', key=abs, ascending=False)
+
 ```
 
 ---
 
 ### 5. K-Nearest Neighbours (KNN)
 
-KNN predicts using the **nearest examples** in feature space. New observations are classified based on the majority class among their \(k\) closest neighbours.
+KNN predicts using the **nearest examples** in feature space. New observations are classified based on the majority class among their $k$ closest neighbours.
 
 **Key Characteristics:**
-- **No model training:** All computation happens at prediction time (lazy learner).
-- **Distance-based:** Typically uses Euclidean distance; sensitive to feature scaling.
-- **Choice of \(k\):** Small \(k\) = flexible but noisy; large \(k\) = smoother but may miss local patterns.
+
+* **No model training:** All computation happens at prediction time (lazy learner).
+* **Distance-based:** Typically uses Euclidean distance; sensitive to feature scaling.
+* **Choice of $k$:** Small $k$ = flexible but noisy; large $k$ = smoother but may miss local patterns.
 
 **Challenges:**
-- Slow on large datasets (must compute distances to all training points).
-- Sensitive to scaling — always standardise features.
-- Curse of dimensionality: performance degrades in high-dimensional spaces.
+
+* Slow on large datasets (must compute distances to all training points).
+* Sensitive to scaling — always standardise features.
+* Curse of dimensionality: performance degrades in high-dimensional spaces.
 
 ```python
 from sklearn.neighbors import KNeighborsClassifier
@@ -230,6 +235,7 @@ X_scaled = scaler.fit_transform(X)
 
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(X_scaled, y_train)
+
 ```
 
 ---
@@ -239,19 +245,19 @@ model.fit(X_scaled, y_train)
 #### Confusion Matrix
 
 |  | Predicted Positive | Predicted Negative |
-|---|---|---|
+| --- | --- | --- |
 | **Actual Positive** | True Positive (TP) | False Negative (FN) |
 | **Actual Negative** | False Positive (FP) | True Negative (TN) |
 
 #### Key Metrics
 
 | Metric | Formula | Interpretation | When to Focus |
-|---|---|---|---|
-| **Accuracy** | \(\frac{TP + TN}{\text{Total}}\) | Overall correctness | Balanced classes |
-| **Precision** | \(\frac{TP}{TP + FP}\) | Of predicted positives, how many are correct? | False positives are costly (e.g., spam filter) |
-| **Recall (Sensitivity)** | \(\frac{TP}{TP + FN}\) | Of actual positives, how many are caught? | False negatives are dangerous (e.g., disease diagnosis) |
-| **Specificity** | \(\frac{TN}{TN + FP}\) | Of actual negatives, how many are correctly rejected? | Complement to recall for negative class |
-| **F1-Score** | \(2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}\) | Harmonic mean; balances precision and recall | Uneven class distribution; need single metric |
+| --- | --- | --- | --- |
+| **Accuracy** | $\frac{TP + TN}{\text{Total}}$ | Overall correctness | Balanced classes |
+| **Precision** | $\frac{TP}{TP + FP}$ | Of predicted positives, how many are correct? | False positives are costly (e.g., spam filter) |
+| **Recall (Sensitivity)** | $\frac{TP}{TP + FN}$ | Of actual positives, how many are caught? | False negatives are dangerous (e.g., disease diagnosis) |
+| **Specificity** | $\frac{TN}{TN + FP}$ | Of actual negatives, how many are correctly rejected? | Complement to recall for negative class |
+| **F1-Score** | $2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$ | Harmonic mean; balances precision and recall | Uneven class distribution; need single metric |
 
 **Critical Warning:** Accuracy is misleading for imbalanced datasets. If fraud occurs in 0.1% of transactions, a model predicting "not fraud" for everything achieves 99.9% accuracy but is completely useless.
 
@@ -260,6 +266,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 cm = confusion_matrix(y_true, y_pred)
 print(classification_report(y_true, y_pred))
+
 ```
 
 #### ROC Curve and AUC
@@ -267,10 +274,11 @@ print(classification_report(y_true, y_pred))
 The **ROC curve** plots Recall (True Positive Rate) vs. 1 − Specificity (False Positive Rate) across all probability thresholds.
 
 **AUC (Area Under the Curve):**
-- 0.50 = Random guessing
-- 0.70–0.80 = Reasonable
-- 0.80–0.90 = Strong
-- 0.90+ = Excellent
+
+* 0.50 = Random guessing
+* 0.70–0.80 = Reasonable
+* 0.80–0.90 = Strong
+* 0.90+ = Excellent
 
 **Use:** Comparing models independent of threshold choice. For imbalanced data, also consider the **Precision-Recall curve** (more informative when the positive class is rare).
 
@@ -281,15 +289,14 @@ fpr, tpr, _ = roc_curve(y_true, y_proba)
 auc = roc_auc_score(y_true, y_proba)
 
 RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=auc).plot()
+
 ```
 
 #### Lift Chart
 
 Shows improvement over random selection at different percentiles.
 
-\[
-\text{Lift} = \frac{\text{Response rate in top } p\%}{\text{Overall response rate}}
-\]
+$$\text{Lift} = \frac{\text{Response rate in top } p\%}{\text{Overall response rate}}$$
 
 Useful for resource-constrained targeting (e.g., marketing campaigns where you can only contact the top 20% of leads).
 
@@ -302,7 +309,7 @@ Useful for resource-constrained targeting (e.g., marketing campaigns where you c
 **Solutions:**
 
 | Strategy | Description | When to Use |
-|---|---|---|
+| --- | --- | --- |
 | **Use Better Metrics** | Precision, recall, AUC, lift (not accuracy) | Always for imbalanced data |
 | **Adjust Threshold** | Lower threshold below 0.5 to increase recall | When catching positives is critical |
 | **Undersampling** | Randomly remove records from majority class | Abundant majority data; risk losing information |
@@ -312,9 +319,10 @@ Useful for resource-constrained targeting (e.g., marketing campaigns where you c
 | **Cost-Sensitive Learning** | Incorporate business costs into decision rule | Misclassification costs are asymmetric and quantifiable |
 
 **SMOTE Algorithm:**
-1. For each minority record, find \(k\) nearest minority neighbours.
+
+1. For each minority record, find $k$ nearest minority neighbours.
 2. Randomly select one neighbour.
-3. Create synthetic record: \(X_{\text{new}} = X + \lambda \times (X_{\text{neighbour}} - X)\), where \(\lambda \sim \text{Uniform}(0, 1)\).
+3. Create synthetic record: $X_{\text{new}} = X + \lambda \times (X_{\text{neighbour}} - X)$, where $\lambda \sim \text{Uniform}(0, 1)$.
 4. Repeat to achieve desired balance.
 
 ```python
@@ -332,6 +340,7 @@ def find_optimal_threshold(y_true, y_proba, metric='f1'):
     scores = [f1_score(y_true, (y_proba >= t).astype(int)) for t in thresholds]
     optimal_idx = np.argmax(scores)
     return thresholds[optimal_idx], scores[optimal_idx]
+
 ```
 
 ---
@@ -339,62 +348,64 @@ def find_optimal_threshold(y_true, y_proba, metric='f1'):
 ## Important Formulas
 
 ### Naive Bayes
-\[
-P(Y=i \mid X_1, \dots, X_p) \propto P(Y=i) \prod_{j=1}^{p} P(X_j \mid Y=i)
-\]
+
+$$P(Y=i \mid X_1, \dots, X_p) \propto P(Y=i) \prod_{j=1}^{p} P(X_j \mid Y=i)$$
 
 ### Logistic Regression
-\[
-\text{Logit: } \log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p
-\]
-\[
-\text{Probability: } p = \frac{1}{1 + e^{-(\beta_0 + \sum \beta_j X_j)}}
-\]
-\[
-\text{Odds Ratio for } X_j: \; OR = e^{\beta_j}
-\]
+
+$$\text{Logit: } \log\left(\frac{p}{1-p}\right) = \beta_0 + \beta_1 X_1 + \cdots + \beta_p X_p$$
+
+$$\text{Probability: } p = \frac{1}{1 + e^{-(\beta_0 + \sum \beta_j X_j)}}$$
+
+$$\text{Odds Ratio for } X_j: \; OR = e^{\beta_j}$$
 
 ### Classification Metrics
-\[
-\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN}
-\]
-\[
-\text{Specificity} = \frac{TN}{TN + FP}, \quad \text{F1} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
-\]
-\[
-\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
-\]
+
+$$\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN}$$
+
+$$\text{Specificity} = \frac{TN}{TN + FP}, \quad \text{F1} = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
+
+$$\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$$
 
 ### LDA Discriminant Function
-\[
-\delta_k(\mathbf{x}) = \mathbf{x}^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k - \frac{1}{2} \boldsymbol{\mu}_k^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k + \log(\pi_k)
-\]
+
+$$\delta_k(\mathbf{x}) = \mathbf{x}^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k - \frac{1}{2} \boldsymbol{\mu}_k^T \boldsymbol{\Sigma}^{-1} \boldsymbol{\mu}_k + \log(\pi_k)$$
 
 ---
 
 ## Common Visualisations
 
 ### Confusion Matrix Heatmap
+
 Useful for classification evaluation and error inspection.
+
 ```python
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+
 ```
 
 ### ROC Curve
+
 Used for threshold comparison and model evaluation.
+
 ```python
 from sklearn.metrics import RocCurveDisplay
 RocCurveDisplay.from_predictions(y_true, y_proba)
+
 ```
 
 ### Precision-Recall Curve
+
 More informative than ROC when the positive class is rare.
+
 ```python
 from sklearn.metrics import PrecisionRecallDisplay
 PrecisionRecallDisplay.from_predictions(y_true, y_proba)
+
 ```
 
 ### Decision Boundary Plots
+
 Useful for visualising class separation in 2D feature space.
 
 ---
@@ -403,12 +414,12 @@ Useful for visualising class separation in 2D feature space.
 
 Classification is one of the most widely used ML techniques in business:
 
-- **Customer Churn Prediction:** Predict which customers are likely to leave.
-- **Fraud Detection:** Identify fraudulent transactions in real time.
-- **Recommendation Systems:** Predict user preference categories.
-- **NLP Systems:** Spam detection, sentiment analysis, document classification.
-- **Medical Diagnosis:** Disease detection and risk stratification.
-- **Credit Scoring:** Predict loan default probability.
+* **Customer Churn Prediction:** Predict which customers are likely to leave.
+* **Fraud Detection:** Identify fraudulent transactions in real time.
+* **Recommendation Systems:** Predict user preference categories.
+* **NLP Systems:** Spam detection, sentiment analysis, document classification.
+* **Medical Diagnosis:** Disease detection and risk stratification.
+* **Credit Scoring:** Predict loan default probability.
 
 ---
 
@@ -439,52 +450,36 @@ Classification is one of the most widely used ML techniques in business:
 
 ## Connections to Other Chapters
 
-- **Chapter 1:** EDA informs feature selection and reveals class imbalance; boxplots/histograms visualise predictor distributions by class.
-- **Chapter 2:** Sampling distributions and bootstrap underpin confidence intervals for classification metrics; binomial distribution models binary outcomes.
-- **Chapter 3:** Hypothesis testing concepts (p-values, Type I/II errors) parallel classification error trade-offs; A/B testing applies to model comparison.
-- **Chapter 4:** Logistic regression extends linear regression to binary outcomes; similar diagnostics and interpretation principles apply.
-- **Chapter 6:** Tree-based methods (random forests, boosting) often outperform the methods in this chapter; ensemble learning builds on single-model foundations.
+* **Chapter 1:** EDA informs feature selection and reveals class imbalance; boxplots/histograms visualise predictor distributions by class.
+* **Chapter 2:** Sampling distributions and bootstrap underpin confidence intervals for classification metrics; binomial distribution models binary outcomes.
+* **Chapter 3:** Hypothesis testing concepts (p-values, Type I/II errors) parallel classification error trade-offs; A/B testing applies to model comparison.
+* **Chapter 4:** Logistic regression extends linear regression to binary outcomes; similar diagnostics and interpretation principles apply.
+* **Chapter 6:** Tree-based methods (random forests, boosting) often outperform the methods in this chapter; ensemble learning builds on single-model foundations.
 
 ---
-
-## Progress Checklist
-
-- [ ] Read complete chapter (pp. 195–236)
-- [ ] Implement Naive Bayes classifier with categorical features
-- [ ] Fit LDA and interpret discriminant function weights
-- [ ] Fit logistic regression; interpret coefficients as odds ratios
-- [ ] Compute confusion matrix, precision, recall, specificity, F1, and AUC
-- [ ] Plot ROC and precision-recall curves; compare models
-- [ ] Apply undersampling, oversampling, and SMOTE to imbalanced data
-- [ ] Optimise classification threshold based on custom cost function
-- [ ] Complete `05_classification.ipynb`
-- [ ] Solve all exercises in `exercises.ipynb`
-- [ ] Experiment with different classifiers in `experiments.ipynb`
-
----
-
 
 ### Questions I Still Have
-- When should I prefer logistic regression over tree-based methods for interpretability vs. accuracy?
-- How do I properly validate threshold selection to avoid overfitting to validation data?
-- What's the most reliable way to handle high-cardinality categorical features in Naive Bayes?
-- How can I incorporate business costs directly into model training (not just threshold selection)?
-- When is SMOTE appropriate vs. simple oversampling or weighting?
+
+* When should I prefer logistic regression over tree-based methods for interpretability vs. accuracy?
+* How do I properly validate threshold selection to avoid overfitting to validation data?
+* What's the most reliable way to handle high-cardinality categorical features in Naive Bayes?
+* How can I incorporate business costs directly into model training (not just threshold selection)?
+* When is SMOTE appropriate vs. simple oversampling or weighting?
 
 ---
 
 ## Progress Checklist
 
-- [ ] Read complete chapter (pp. 195–236)
-- [ ] Implement Naive Bayes classifier with categorical features
-- [ ] Fit LDA and interpret discriminant function weights
-- [ ] Fit logistic regression; interpret coefficients as odds ratios
-- [ ] Compute confusion matrix, precision, recall, specificity, F1, and AUC
-- [ ] Plot ROC and precision-recall curves; compare models
-- [ ] Apply undersampling, oversampling, and SMOTE to imbalanced data
-- [ ] Optimise classification threshold based on custom cost function
-- [ ] Complete `05_classification.ipynb`
-- [ ] Solve all exercises in `exercises.ipynb`
-- [ ] Experiment with different classifiers in `experiments.ipynb`
+* [ ] Read complete chapter (pp. 195–236)
+* [ ] Implement Naive Bayes classifier with categorical features
+* [ ] Fit LDA and interpret discriminant function weights
+* [ ] Fit logistic regression; interpret coefficients as odds ratios
+* [ ] Compute confusion matrix, precision, recall, specificity, F1, and AUC
+* [ ] Plot ROC and precision-recall curves; compare models
+* [ ] Apply undersampling, oversampling, and SMOTE to imbalanced data
+* [ ] Optimise classification threshold based on custom cost function
+* [ ] Complete `05_classification.ipynb`
+* [ ] Solve all exercises in `exercises.ipynb`
+* [ ] Experiment with different classifiers in `experiments.ipynb`
 
 ---

@@ -56,8 +56,8 @@ By the end of this chapter, I should be able to:
 | Predictor (Independent) Variables | Input features used for prediction | `X` |
 | Simple Linear Regression | One predictor variable | `LinearRegression()` |
 | Multiple Linear Regression | Multiple predictor variables | `LinearRegression()` |
-| Coefficient (\(\beta\)) | Effect size of each predictor | `model.coef_` |
-| Intercept (\(\beta_0\)) | Baseline prediction when all X = 0 | `model.intercept_` |
+| Coefficient ($\beta$) | Effect size of each predictor | `model.coef_` |
+| Intercept ($\beta_0$) | Baseline prediction when all X = 0 | `model.intercept_` |
 | Residual | Prediction error (actual − predicted) | `actual - predicted` |
 | RMSE | Root Mean Squared Error — average prediction error magnitude | `mean_squared_error()` |
 | R² | Coefficient of determination — proportion of variance explained | `model.score()` |
@@ -98,6 +98,7 @@ Regression models the relationship between **predictors (X)** and an **outcome (
 ```python
 X = df[["income", "age"]]
 y = df["spending"]
+
 ```
 
 ---
@@ -108,24 +109,21 @@ Uses **one predictor variable** to model the outcome.
 
 **Model Form:**
 
-\[
-Y = \beta_0 + \beta_1 X + \epsilon
-\]
+$$Y = \beta_0 + \beta_1 X + \epsilon$$
 
 Where:
-- \(Y\) = response/outcome variable
-- \(X\) = predictor/feature variable
-- \(\beta_0\) = intercept (predicted Y when X = 0)
-- \(\beta_1\) = slope (change in Y per unit change in X)
-- \(\epsilon\) = error term (unexplained variation)
+
+* $Y$ = response/outcome variable
+* $X$ = predictor/feature variable
+* $\beta_0$ = intercept (predicted Y when X = 0)
+* $\beta_1$ = slope (change in Y per unit change in X)
+* $\epsilon$ = error term (unexplained variation)
 
 **Least Squares Estimation:** Minimises the residual sum of squares (RSS):
 
-\[
-RSS = \sum_{i=1}^n (Y_i - \hat{Y}_i)^2
-\]
+$$RSS = \sum_{i=1}^n (Y_i - \hat{Y}_i)^2$$
 
-**Coefficient Interpretation:** The coefficient \(\beta_1\) tells us how much Y changes when X changes by one unit.
+**Coefficient Interpretation:** The coefficient $\beta_1$ tells us how much Y changes when X changes by one unit.
 
 ```python
 from sklearn.linear_model import LinearRegression
@@ -133,6 +131,7 @@ from sklearn.linear_model import LinearRegression
 model = LinearRegression()
 model.fit(X, y)
 print(f"Intercept: {model.intercept_}, Coefficients: {model.coef_}")
+
 ```
 
 ---
@@ -143,12 +142,10 @@ Uses **several predictor variables** simultaneously.
 
 **Model Form:**
 
-\[
-Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \epsilon
-\]
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \epsilon$$
 
 **Coefficient Interpretation (Critical):**
-\(\beta_j\) = expected change in Y per unit change in \(X_j\), **holding all other predictors constant**. This conditional interpretation is crucial — correlated predictors can distort apparent effects.
+$\beta_j$ = expected change in Y per unit change in $X_j$, **holding all other predictors constant**. This conditional interpretation is crucial — correlated predictors can distort apparent effects.
 
 **Example:** House price prediction may depend on square footage, bedrooms, bathrooms, neighbourhood, and building grade.
 
@@ -158,6 +155,7 @@ y = df["AdjSalePrice"]
 
 model = LinearRegression()
 model.fit(X, y)
+
 ```
 
 ---
@@ -165,17 +163,20 @@ model.fit(X, y)
 ### 5. Factor Variables in Regression
 
 **Dummy Variable Encoding (Reference Coding):**
-- A factor with \(P\) levels creates \(P-1\) binary dummy variables.
-- One level serves as the reference; coefficients represent differences from that reference.
-- *Example:* `PropertyType` with levels {Multiplex, Single Family, Townhouse} → two dummy variables.
+
+* A factor with $P$ levels creates $P-1$ binary dummy variables.
+* One level serves as the reference; coefficients represent differences from that reference.
+* *Example:* `PropertyType` with levels {Multiplex, Single Family, Townhouse} → two dummy variables.
 
 **One-Hot Encoding:**
-- Creates \(P\) binary columns (all levels represented).
-- Required for tree-based models, KNN, and neural networks.
-- Causes multicollinearity in linear/logistic regression if an intercept is included.
+
+* Creates $P$ binary columns (all levels represented).
+* Required for tree-based models, KNN, and neural networks.
+* Causes multicollinearity in linear/logistic regression if an intercept is included.
 
 **High-Cardinality Factors (Zip Codes, Product IDs):**
-- Strategies include grouping by outcome (median residual by zip code), target encoding, or embeddings.
+
+* Strategies include grouping by outcome (median residual by zip code), target encoding, or embeddings.
 
 ```python
 # Reference coding (for linear regression)
@@ -183,27 +184,29 @@ X_ref = pd.get_dummies(df[['PropertyType', 'ZipCode']], drop_first=True)
 
 # One-hot encoding (for tree models, KNN)
 X_encoded = pd.get_dummies(df[['PropertyType', 'ZipCode']], drop_first=False)
+
 ```
 
 ---
 
 ### 6. Interpreting the Regression Equation
 
-**Correlated Predictors:** When \(X_1\) and \(X_2\) are correlated, coefficients become unstable and hard to interpret. For example, the `Bedrooms` coefficient may appear negative in a housing model because larger homes (which have more bedrooms) are already captured by `SqFtTotLiving`.
+**Correlated Predictors:** When $X_1$ and $X_2$ are correlated, coefficients become unstable and hard to interpret. For example, the `Bedrooms` coefficient may appear negative in a housing model because larger homes (which have more bedrooms) are already captured by `SqFtTotLiving`.
 
 **Multicollinearity:** Perfect or near-perfect correlation among predictors causes large standard errors and unstable coefficients. Detected via Variance Inflation Factor (VIF) > 5–10. Solutions: remove redundant variables, combine correlated predictors, or use PCA.
 
 **Confounding Variables:** An omitted variable that affects both predictor and outcome biases coefficient estimates. *Example:* Location omitted from housing model biases `Bathrooms` coefficient. Solution: include important confounders or use causal inference methods.
 
-**Interaction Effects:** The effect of \(X_1\) on \(Y\) depends on the level of \(X_2\).
+**Interaction Effects:** The effect of $X_1$ on $Y$ depends on the level of $X_2$.
 
 **Model with interaction:**
-\[
-Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 \times X_2) + \epsilon
-\]
+
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 (X_1 \times X_2) + \epsilon$$
 
 ```python
 df["interaction"] = df["ad_spend"] * df["age"]
+
 ```
 
 ---
@@ -211,11 +214,11 @@ df["interaction"] = df["ad_spend"] * df["age"]
 ### 7. Model Performance Metrics
 
 | Metric | Formula | Interpretation |
-|---|---|---|
-| **RMSE** | \(\sqrt{\frac{1}{n}\sum (Y_i - \hat{Y}_i)^2}\) | Average prediction error (same units as Y). Lower is better. |
-| **RSE** | \(\sqrt{\frac{RSS}{n-p-1}}\) | RMSE adjusted for degrees of freedom. |
-| **R²** | \(1 - \frac{RSS}{TSS}\) | Proportion of variance explained (0 to 1). 0 = no explanatory power; 1 = perfect prediction. |
-| **Adjusted R²** | \(1 - (1-R^2)\frac{n-1}{n-p-1}\) | Penalises adding non-informative predictors. |
+| --- | --- | --- |
+| **RMSE** | $\sqrt{\frac{1}{n}\sum (Y_i - \hat{Y}_i)^2}$ | Average prediction error (same units as Y). Lower is better. |
+| **RSE** | $\sqrt{\frac{RSS}{n-p-1}}$ | RMSE adjusted for degrees of freedom. |
+| **R²** | $1 - \frac{RSS}{TSS}$ | Proportion of variance explained (0 to 1). 0 = no explanatory power; 1 = perfect prediction. |
+| **Adjusted R²** | $1 - (1-R^2)\frac{n-1}{n-p-1}$ | Penalises adding non-informative predictors. |
 
 **Important:** High R² does NOT guarantee good generalisation. Always validate on held-out data.
 
@@ -225,6 +228,7 @@ import numpy as np
 
 rmse = np.sqrt(mean_squared_error(y_true, y_pred))
 r2 = r2_score(y_true, y_pred)
+
 ```
 
 ---
@@ -232,18 +236,18 @@ r2 = r2_score(y_true, y_pred)
 ### 8. Residuals and Diagnostics
 
 **Residuals** are prediction errors:
-\[
-\text{Residual} = \text{Actual} - \text{Predicted}
-\]
+
+
+$$\text{Residual} = \text{Actual} - \text{Predicted}$$
 
 Good regression models have small, randomly scattered residuals. Residual analysis helps identify poor fit, missing relationships, outliers, and assumption violations.
 
 **Key Diagnostic Checks:**
 
 | Issue | Detection | Fix |
-|---|---|---|
+| --- | --- | --- |
 | **Outliers** | Standardised residual > 2–3 | Investigate, robust regression |
-| **Influential Values** | Cook's distance > \(4/(n-p-1)\) | Investigate, robust methods |
+| **Influential Values** | Cook's distance > $4/(n-p-1)$ | Investigate, robust methods |
 | **Heteroskedasticity** | Funnel shape in residuals vs. fitted plot | Transform Y, weighted regression, robust SE |
 | **Non-Normal Residuals** | QQ-plot deviation from diagonal | Transform Y, bootstrap inference |
 | **Nonlinearity** | Partial residual plot shows curves | Polynomial terms, splines, GAM |
@@ -275,6 +279,7 @@ axes[2].set_title('Scale-Location')
 
 plt.tight_layout()
 plt.show()
+
 ```
 
 ---
@@ -282,23 +287,26 @@ plt.show()
 ### 9. Polynomial and Spline Regression
 
 **Polynomial Regression:** Add powers of predictor:
-\[
-Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \epsilon
-\]
-- Simple and interpretable for low degrees.
-- Can be unstable and "wiggly" at boundaries; poor for extrapolation.
+
+
+$$Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \epsilon$$
+
+* Simple and interpretable for low degrees.
+* Can be unstable and "wiggly" at boundaries; poor for extrapolation.
 
 **Spline Regression:** Piecewise polynomials joined smoothly at knots.
-- **Cubic splines:** Continuous first and second derivatives.
-- **Natural splines:** Linear beyond boundary knots (better extrapolation).
-- Knot selection: quantiles of predictor, domain knowledge, or automated via GAM.
+
+* **Cubic splines:** Continuous first and second derivatives.
+* **Natural splines:** Linear beyond boundary knots (better extrapolation).
+* Knot selection: quantiles of predictor, domain knowledge, or automated via GAM.
 
 **Generalised Additive Models (GAM):**
-\[
-Y = \beta_0 + f_1(X_1) + f_2(X_2) + \cdots + f_p(X_p) + \epsilon
-\]
-- Each \(f_j\) is a smooth function (typically a spline) estimated from data.
-- Advantages: automatic knot selection, interpretable smooths, handles nonlinearity automatically.
+
+
+$$Y = \beta_0 + f_1(X_1) + f_2(X_2) + \cdots + f_p(X_p) + \epsilon$$
+
+* Each $f_j$ is a smooth function (typically a spline) estimated from data.
+* Advantages: automatic knot selection, interpretable smooths, handles nonlinearity automatically.
 
 ```python
 # Polynomial features
@@ -310,6 +318,7 @@ X_poly = poly.fit_transform(X[['SqFtTotLiving']])
 from pygam import LinearGAM, s, l
 gam = LinearGAM(s(0) + l(1) + l(2) + l(3)).fit(X, y)
 gam.summary()
+
 ```
 
 ---
@@ -317,9 +326,9 @@ gam.summary()
 ### 10. Prediction Intervals vs. Confidence Intervals
 
 | Interval Type | Purpose | Width |
-|---|---|---|
+| --- | --- | --- |
 | **Confidence Interval** | Uncertainty in the *mean* prediction | Narrower |
-| **Prediction Interval** | Uncertainty in an *individual* prediction | Wider (includes individual variation \(\sigma^2\)) |
+| **Prediction Interval** | Uncertainty in an *individual* prediction | Wider (includes individual variation $\sigma^2$) |
 
 **Extrapolation Danger:** Predicting outside the range of training data yields unreliable results. Always document predictor ranges for safe deployment.
 
@@ -330,9 +339,10 @@ gam.summary()
 **Overfitting:** The model memorises noise instead of learning patterns. Symptoms: excellent training performance, poor test performance. Causes: too many variables, small datasets, overly complex models.
 
 **Bias-Variance Trade-Off:**
-- **High bias:** Model too simple, underfitting.
-- **High variance:** Model too complex, overfitting.
-- **Goal:** Balanced generalisation.
+
+* **High bias:** Model too simple, underfitting.
+* **High variance:** Model too complex, overfitting.
+* **Goal:** Balanced generalisation.
 
 **Cross-Validation for Prediction:** Split data into training/validation folds, evaluate on held-out data, repeat, and average results to estimate out-of-sample performance.
 
@@ -340,6 +350,7 @@ gam.summary()
 from sklearn.model_selection import cross_val_score
 cv_scores = cross_val_score(model, X, y, cv=5, scoring='neg_root_mean_squared_error')
 print(f"CV RMSE: {-cv_scores.mean():,.0f} ± {-cv_scores.std():,.0f}")
+
 ```
 
 ---
@@ -360,6 +371,7 @@ ridge.fit(X, y)
 
 lasso = Lasso(alpha=0.1)
 lasso.fit(X, y)
+
 ```
 
 ---
@@ -367,65 +379,63 @@ lasso.fit(X, y)
 ## Important Formulas
 
 ### Simple Linear Regression
-\[
-Y = \beta_0 + \beta_1 X + \epsilon
-\]
-\[
-\hat{\beta}_1 = \frac{\sum (X_i - \bar{X})(Y_i - \bar{Y})}{\sum (X_i - \bar{X})^2}, \quad \hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X}
-\]
+
+$$Y = \beta_0 + \beta_1 X + \epsilon$$
+
+$$\hat{\beta}_1 = \frac{\sum (X_i - \bar{X})(Y_i - \bar{Y})}{\sum (X_i - \bar{X})^2}, \quad \hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X}$$
 
 ### Multiple Linear Regression
-\[
-Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \epsilon
-\]
-\[
-\hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y}
-\]
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p + \epsilon$$
+
+$$\hat{\boldsymbol{\beta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{Y}$$
 
 ### Model Evaluation
-\[
-RMSE = \sqrt{\frac{1}{n}\sum (Y_i - \hat{Y}_i)^2}, \quad R^2 = 1 - \frac{\sum (Y_i - \hat{Y}_i)^2}{\sum (Y_i - \bar{Y})^2}
-\]
-\[
-\text{Adjusted } R^2 = 1 - (1-R^2)\frac{n-1}{n-p-1}
-\]
+
+$$RMSE = \sqrt{\frac{1}{n}\sum (Y_i - \hat{Y}_i)^2}, \quad R^2 = 1 - \frac{\sum (Y_i - \hat{Y}_i)^2}{\sum (Y_i - \bar{Y})^2}$$
+
+$$\text{Adjusted } R^2 = 1 - (1-R^2)\frac{n-1}{n-p-1}$$
 
 ### Diagnostics
-\[
-\text{Standardized Residual: } r_i = \frac{e_i}{s\sqrt{1 - h_i}}
-\]
-\[
-\text{Cook's Distance: } D_i = \frac{r_i^2}{p} \times \frac{h_i}{1 - h_i}
-\]
+
+$$\text{Standardized Residual: } r_i = \frac{e_i}{s\sqrt{1 - h_i}}$$
+
+$$\text{Cook's Distance: } D_i = \frac{r_i^2}{p} \times \frac{h_i}{1 - h_i}$$
 
 ### Nonlinear Extensions
-\[
-\text{Polynomial: } Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \cdots + \beta_k X^k + \epsilon
-\]
-\[
-\text{Cubic Spline: } f(X) = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \sum \gamma_j (X - \kappa_j)_+^3
-\]
+
+$$\text{Polynomial: } Y = \beta_0 + \beta_1 X + \beta_2 X^2 + \cdots + \beta_k X^k + \epsilon$$
+
+$$\text{Cubic Spline: } f(X) = \beta_0 + \beta_1 X + \beta_2 X^2 + \beta_3 X^3 + \sum \gamma_j (X - \kappa_j)_+^3$$
 
 ---
 
 ## Common Visualisations
 
 ### Scatterplot with Regression Line
+
 Used to inspect relationships, trends, and linearity.
+
 ```python
 sns.regplot(data=df, x="X", y="Y")
+
 ```
 
 ### Residual Diagnostic Plots
+
 Used to inspect prediction quality and model assumptions. Good residuals are randomly scattered with constant variance.
 
 ### Correlation Heatmap
+
 Useful for detecting multicollinearity among predictors.
+
 ```python
 sns.heatmap(df.corr(numeric_only=True), annot=True)
+
 ```
 
 ### Partial Residual Plots
+
 Visualise the relationship between one predictor and the outcome, adjusting for all other predictors. Used to detect nonlinearity.
 
 ---
@@ -476,38 +486,36 @@ Regression is central to machine learning.
 
 ## Connections to Other Chapters
 
-- **Chapter 1:** EDA tools (scatterplots, boxplots) inform predictor selection and reveal nonlinearities before modelling.
-- **Chapter 2:** Sampling distributions and bootstrap underpin confidence intervals for regression coefficients.
-- **Chapter 3:** t-tests and F-tests for coefficient significance; permutation tests as assumption-free alternatives.
-- **Chapter 5:** Logistic regression extends linear regression to binary outcomes; similar diagnostics and interpretation principles apply.
-- **Chapter 6:** Tree-based models (random forests, boosting) automatically handle nonlinearities and interactions that regression requires manual specification for.
-- **Chapter 7:** PCA can reduce dimensionality before regression; clustering can identify subpopulations for stratified modelling.
+* **Chapter 1:** EDA tools (scatterplots, boxplots) inform predictor selection and reveal nonlinearities before modelling.
+* **Chapter 2:** Sampling distributions and bootstrap underpin confidence intervals for regression coefficients.
+* **Chapter 3:** t-tests and F-tests for coefficient significance; permutation tests as assumption-free alternatives.
+* **Chapter 5:** Logistic regression extends linear regression to binary outcomes; similar diagnostics and interpretation principles apply.
+* **Chapter 6:** Tree-based models (random forests, boosting) automatically handle nonlinearities and interactions that regression requires manual specification for.
+* **Chapter 7:** PCA can reduce dimensionality before regression; clustering can identify subpopulations for stratified modelling.
 
 ---
-
 
 ### Questions I Still Have
-- How do I decide between polynomial, spline, and GAM for a given nonlinear relationship?
-- When is it appropriate to use reference coding vs. one-hot encoding in practice?
-- What's the best way to handle high-cardinality factors like zip codes without overfitting?
-- How can I automate residual diagnostic checks in a production pipeline?
-- When should I prioritise interpretability (linear model) vs. predictive accuracy (ensemble methods)?
+
+* How do I decide between polynomial, spline, and GAM for a given nonlinear relationship?
+* When is it appropriate to use reference coding vs. one-hot encoding in practice?
+* What's the best way to handle high-cardinality factors like zip codes without overfitting?
+* How can I automate residual diagnostic checks in a production pipeline?
+* When should I prioritise interpretability (linear model) vs. predictive accuracy (ensemble methods)?
+
 ---
-
-
 
 ## Progress Checklist
 
-- [ ] Read complete chapter (pp. 141–194)
-- [ ] Fit simple and multiple linear regression models
-- [ ] Implement dummy variable encoding for factor variables
-- [ ] Create residual diagnostic plots (residuals vs. fitted, QQ, scale-location)
-- [ ] Detect and investigate outliers/influential points using Cook's distance
-- [ ] Fit polynomial and spline models to capture nonlinearity
-- [ ] Apply cross-validation to estimate out-of-sample RMSE
-- [ ] Complete `04_regression_and_prediction.ipynb`
-- [ ] Solve all exercises in `exercises.ipynb`
-- [ ] Experiment with GAM and interaction terms in `experiments.ipynb`
+* [ ] Read complete chapter (pp. 141–194)
+* [ ] Fit simple and multiple linear regression models
+* [ ] Implement dummy variable encoding for factor variables
+* [ ] Create residual diagnostic plots (residuals vs. fitted, QQ, scale-location)
+* [ ] Detect and investigate outliers/influential points using Cook's distance
+* [ ] Fit polynomial and spline models to capture nonlinearity
+* [ ] Apply cross-validation to estimate out-of-sample RMSE
+* [ ] Complete `04_regression_and_prediction.ipynb`
+* [ ] Solve all exercises in `exercises.ipynb`
+* [ ] Experiment with GAM and interaction terms in `experiments.ipynb`
 
 ---
-

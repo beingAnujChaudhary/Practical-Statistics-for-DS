@@ -93,12 +93,10 @@ Unsupervised learning attempts to find hidden structure in data without labelled
 PCA is a dimensionality reduction technique that transforms many correlated numeric variables into a smaller set of uncorrelated principal components that capture most of the total variance.
 
 **Mathematical Form — First Principal Component:**
-\[
-Z_1 = w_{1,1}X_1 + w_{1,2}X_2 + \cdots + w_{1,p}X_p
-\]
-Where weights \(w\) are chosen to maximise variance explained, subject to:
+$$Z_1 = w_{1,1}X_1 + w_{1,2}X_2 + \cdots + w_{1,p}X_p$$
+Where weights $w$ are chosen to maximise variance explained, subject to:
 - Components are orthogonal (uncorrelated with each other)
-- Weights are normalised: \(\sum w_{1,j}^2 = 1\)
+- Weights are normalised: $\sum w_{1,j}^2 = 1$
 
 **Key Properties:**
 - PC1 explains the most variance; PC2 explains the most remaining variance orthogonal to PC1, and so on.
@@ -134,35 +132,39 @@ loadings = pd.DataFrame(
 
 # Transform data
 X_pca = pca.transform(X_scaled)
+
 ```
 
 **Benefits:**
-- Simplifies data for visualisation
-- Reduces noise and computational burden
-- Creates uncorrelated features for downstream modelling
+
+* Simplifies data for visualisation
+* Reduces noise and computational burden
+* Creates uncorrelated features for downstream modelling
 
 ---
 
 ### 3. K-Means Clustering
 
-K-means is one of the most popular clustering algorithms. It partitions \(n\) records into \(K\) clusters by minimising the within-cluster sum of squares (WCSS):
+K-means is one of the most popular clustering algorithms. It partitions $n$ records into $K$ clusters by minimising the within-cluster sum of squares (WCSS):
 
-\[
-\text{Minimise: } \sum_{k=1}^{K} \sum_{i \in C_k} \|x_i - \mu_k\|^2
-\]
-Where \(\mu_k\) is the centroid (mean vector) of cluster \(C_k\).
+$$\text{Minimise: } \sum_{k=1}^{K} \sum_{i \in C_k} \|x_i - \mu_k\|^2$$
+
+
+Where $\mu_k$ is the centroid (mean vector) of cluster $C_k$.
 
 **Algorithm:**
-1. Initialise \(K\) cluster centroids (randomly or via k-means++).
+
+1. Initialise $K$ cluster centroids (randomly or via k-means++).
 2. Assign each record to the nearest centroid (Euclidean distance).
 3. Recompute centroids as the mean of assigned records.
 4. Repeat steps 2–3 until assignments stabilise.
 
 **Key Considerations:**
-- Requires pre-specifying \(K\) (number of clusters).
-- Sensitive to initial centroid placement; use multiple random starts (`n_init`).
-- Assumes clusters are spherical and of similar size/density.
-- **Standardisation is essential:** Variables with large scales dominate distance calculations.
+
+* Requires pre-specifying $K$ (number of clusters).
+* Sensitive to initial centroid placement; use multiple random starts (`n_init`).
+* Assumes clusters are spherical and of similar size/density.
+* **Standardisation is essential:** Variables with large scales dominate distance calculations.
 
 ```python
 from sklearn.cluster import KMeans
@@ -176,10 +178,11 @@ clusters = kmeans.fit_predict(X_scaled)
 
 # Centroids in original scale
 centroids = scaler.inverse_transform(kmeans.cluster_centers_)
+
 ```
 
 **Advantages:** Simple, fast, scalable to large datasets.
-**Limitations:** Must choose \(K\) beforehand, sensitive to scaling, struggles with irregular cluster shapes.
+**Limitations:** Must choose $K$ beforehand, sensitive to scaling, struggles with irregular cluster shapes.
 
 ---
 
@@ -190,9 +193,9 @@ Determining the appropriate number of clusters is one of the most challenging as
 **Methods for Selecting K:**
 
 | Method | Description | How to Use |
-|---|---|---|
+| --- | --- | --- |
 | **Elbow Method** | Plot WCSS vs. K; look for "elbow" where marginal gain diminishes | Visual inspection |
-| **Silhouette Score** | Measures how similar records are to their own cluster vs. other clusters | Higher is better; range [−1, 1] |
+| **Silhouette Score** | Measures how similar records are to their own cluster vs. other clusters | Higher is better; range $[−1, 1]$ |
 | **Gap Statistic** | Compares observed WCSS to reference null distribution | Statistical test |
 | **Cross-Validation** | Assess stability of clusters on holdout data | Practical for large datasets |
 | **Domain Knowledge** | Practical constraints often dictate reasonable K | Essential for business application |
@@ -217,6 +220,7 @@ plt.show()
 # Silhouette score
 from sklearn.metrics import silhouette_score
 silhouette = silhouette_score(X_scaled, clusters)
+
 ```
 
 ---
@@ -226,6 +230,7 @@ silhouette = silhouette_score(X_scaled, clusters)
 Hierarchical clustering creates a nested cluster structure by iteratively merging (agglomerative) or splitting (divisive) records based on pairwise dissimilarity.
 
 **Agglomerative Algorithm (Most Common):**
+
 1. Start with each record as its own cluster.
 2. Compute dissimilarity between all cluster pairs.
 3. Merge the two most similar clusters.
@@ -234,17 +239,18 @@ Hierarchical clustering creates a nested cluster structure by iteratively mergin
 **Linkage Methods (How to Measure Cluster Dissimilarity):**
 
 | Method | Formula | Characteristics |
-|---|---|---|
-| **Single Linkage** | \(\min d(a_i, b_j)\) | "Chaining" effect; sensitive to noise |
-| **Complete Linkage** | \(\max d(a_i, b_j)\) | Compact, well-separated clusters |
-| **Average Linkage** | \(\text{mean } d(a_i, b_j)\) | Compromise between single and complete |
-| **Ward's Method** | Minimise \(\Delta\)(WCSS) | Similar to K-means; minimises variance within clusters |
+| --- | --- | --- |
+| **Single Linkage** | $\min d(a_i, b_j)$ | "Chaining" effect; sensitive to noise |
+| **Complete Linkage** | $\max d(a_i, b_j)$ | Compact, well-separated clusters |
+| **Average Linkage** | $\text{mean } d(a_i, b_j)$ | Compromise between single and complete |
+| **Ward's Method** | Minimise $\Delta(\text{WCSS})$ | Similar to K-means; minimises variance within clusters |
 
 **Dendrogram Interpretation:**
-- Leaves = individual records.
-- Branch height = dissimilarity at merge.
-- A horizontal cut at height \(h\) yields clusters where all within-cluster dissimilarities < \(h\).
-- No need to pre-specify \(K\); explore multiple cuts visually.
+
+* Leaves = individual records.
+* Branch height = dissimilarity at merge.
+* A horizontal cut at height $h$ yields clusters where all within-cluster dissimilarities $< h$.
+* No need to pre-specify $K$; explore multiple cuts visually.
 
 ```python
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
@@ -259,10 +265,11 @@ plt.show()
 
 # Extract clusters
 clusters = fcluster(Z, t=4, criterion='maxclust')
+
 ```
 
 **Advantages:** Interpretable dendrograms, no strict K requirement initially.
-**Limitations:** Computationally expensive (O(n³) time, O(n²) memory); not suitable for very large datasets (>10k records). Merges are irreversible.
+**Limitations:** Computationally expensive ($O(n^3)$ time, $O(n^2)$ memory); not suitable for very large datasets (>10k records). Merges are irreversible.
 
 ---
 
@@ -273,36 +280,40 @@ Clustering depends heavily on distance measures. Smaller distance means more sim
 **Common Distance Metrics:**
 
 | Metric | Formula | Use Case |
-|---|---|---|
-| **Euclidean** | \(\sqrt{\sum (x_i - y_i)^2}\) | Default for continuous variables |
-| **Manhattan** | \(\sum |x_i - y_i|\) | Grid-like distances; robust to outliers |
-| **Mahalanobis** | \(\sqrt{(x-y)^T \Sigma^{-1} (x-y)}\) | Accounts for covariance among variables |
+| --- | --- | --- |
+| **Euclidean** | $\sqrt{\sum (x_i - y_i)^2}$ | Default for continuous variables |
+| **Manhattan** | $\sum | x_i - y_i |
+| **Mahalanobis** | $\sqrt{(x-y)^T \Sigma^{-1} (x-y)}$ | Accounts for covariance among variables |
 
 **Critical Warning:** Feature scaling matters enormously. Without standardisation, variables like salary (e.g., 100,000) dominate distance calculations over variables like age (e.g., 30). Always standardise features before distance-based clustering.
 
 **Gower's Distance for Mixed Data:**
-- Handles numeric + categorical variables in one distance matrix.
-- Numeric variables: scaled Manhattan distance (range 0–1).
-- Categorical variables: 0 if same category, 1 if different.
-- Overall distance = weighted average across all variables.
+
+* Handles numeric + categorical variables in one distance matrix.
+* Numeric variables: scaled Manhattan distance (range 0–1).
+* Categorical variables: 0 if same category, 1 if different.
+* Overall distance = weighted average across all variables.
 
 ---
 
 ### 7. Model-Based Clustering
 
-Instead of distance-based rules, model-based clustering uses probabilistic assumptions. Data is assumed to be generated from a mixture of \(K\) probability distributions (typically multivariate normal).
+Instead of distance-based rules, model-based clustering uses probabilistic assumptions. Data is assumed to be generated from a mixture of $K$ probability distributions (typically multivariate normal).
 
 **Mixture Model:**
-\[
-f(x) = \sum_{k=1}^{K} \pi_k \cdot N_p(x \mid \mu_k, \Sigma_k)
-\]
-Where \(\pi_k\) are mixing proportions (\(\sum \pi_k = 1\)).
+
+
+$$f(x) = \sum_{k=1}^{K} \pi_k \cdot N_p(x \mid \mu_k, \Sigma_k)$$
+
+
+Where $\pi_k$ are mixing proportions ($\sum \pi_k = 1$).
 
 **Advantages:**
-- Statistically principled; uses likelihood and AIC/BIC for model selection.
-- Flexible covariance structures: spherical, diagonal, ellipsoidal.
-- Provides **soft clustering** — probabilistic cluster assignments rather than hard assignments.
-- Handles clusters of different shapes, sizes, and orientations.
+
+* Statistically principled; uses likelihood and AIC/BIC for model selection.
+* Flexible covariance structures: spherical, diagonal, ellipsoidal.
+* Provides **soft clustering** — probabilistic cluster assignments rather than hard assignments.
+* Handles clusters of different shapes, sizes, and orientations.
 
 **Model Selection:** Use BIC (Bayesian Information Criterion) to balance fit vs. complexity. Lower BIC = better model.
 
@@ -317,6 +328,7 @@ hard_clusters = gmm.predict(X_scaled)
 soft_clusters = gmm.predict_proba(X_scaled)
 
 print(f"BIC: {gmm.bic(X_scaled):.1f}")
+
 ```
 
 **Limitations:** Computationally intensive; assumes parametric form (normality); sensitive to initialisation.
@@ -326,7 +338,7 @@ print(f"BIC: {gmm.bic(X_scaled):.1f}")
 ### 8. Handling Categorical Variables in Clustering
 
 | Approach | When to Use | Caveats |
-|---|---|---|
+| --- | --- | --- |
 | **One-Hot Encoding** | Few categories, K-means/PCA | Creates high dimensionality; binary variables may dominate |
 | **Gower's Distance** | Mixed data, hierarchical clustering | Not compatible with all algorithms; computationally heavier |
 | **Separate Clustering** | Many categories | Loses cross-type interactions |
@@ -339,78 +351,77 @@ print(f"BIC: {gmm.bic(X_scaled):.1f}")
 ## Important Formulas
 
 ### PCA
-\[
-\text{Principal Component: } Z_k = w_{k,1}X_1 + \cdots + w_{k,p}X_p, \quad \sum_j w_{k,j}^2 = 1
-\]
-\[
-\text{Variance explained by PC}_k: \frac{\lambda_k}{\sum_j \lambda_j}
-\]
+
+$$\text{Principal Component: } Z_k = w_{k,1}X_1 + \cdots + w_{k,p}X_p, \quad \sum_j w_{k,j}^2 = 1$$
+
+$$\text{Variance explained by PC}_k: \frac{\lambda_k}{\sum_j \lambda_j}$$
 
 ### K-Means
-\[
-\text{Within-Cluster SS: } WCSS = \sum_k \sum_{i \in C_k} \|x_i - \mu_k\|^2
-\]
-\[
-\text{Centroid Update: } \mu_k = \frac{1}{|C_k|} \sum_{i \in C_k} x_i
-\]
+
+$$\text{Within-Cluster SS: } WCSS = \sum_k \sum_{i \in C_k} \|x_i - \mu_k\|^2$$
+
+$$\text{Centroid Update: } \mu_k = \frac{1}{|C_k|} \sum_{i \in C_k} x_i$$
 
 ### Hierarchical Clustering Linkage
-\[
-\text{Single: } D(A,B) = \min_{i \in A, j \in B} d(x_i, x_j)
-\]
-\[
-\text{Complete: } D(A,B) = \max_{i \in A, j \in B} d(x_i, x_j)
-\]
-\[
-\text{Average: } D(A,B) = \frac{1}{|A||B|} \sum_{i \in A} \sum_{j \in B} d(x_i, x_j)
-\]
-\[
-\text{Ward: } \Delta(A,B) = WCSS(A \cup B) - [WCSS(A) + WCSS(B)]
-\]
+
+$$\text{Single: } D(A,B) = \min_{i \in A, j \in B} d(x_i, x_j)$$
+
+$$\text{Complete: } D(A,B) = \max_{i \in A, j \in B} d(x_i, x_j)$$
+
+$$\text{Average: } D(A,B) = \frac{1}{|A||B|} \sum_{i \in A} \sum_{j \in B} d(x_i, x_j)$$
+
+$$\text{Ward: } \Delta(A,B) = WCSS(A \cup B) - [WCSS(A) + WCSS(B)]$$
 
 ### Model-Based Clustering
-\[
-\text{Mixture Density: } f(x) = \sum_{k=1}^{K} \pi_k \cdot N(x \mid \mu_k, \Sigma_k)
-\]
-\[
-\text{BIC} = -2 \cdot \log(L) + p \cdot \log(n) \quad \text{[lower is better]}
-\]
+
+$$\text{Mixture Density: } f(x) = \sum_{k=1}^{K} \pi_k \cdot N(x \mid \mu_k, \Sigma_k)$$
+
+$$\text{BIC} = -2 \cdot \log(L) + p \cdot \log(n) \quad \text{[lower is better]}$$
 
 ### Gower's Distance
-\[
-\text{Numeric: } d_j = \frac{|x_i - x_j|}{R_j} \quad (R_j = \text{range}), \quad \text{Categorical: } d_j = 0 \text{ if same, } 1 \text{ if different}
-\]
-\[
-\text{Overall: } D = \frac{1}{p} \sum_j d_j
-\]
+
+$$\text{Numeric: } d_j = \frac{|x_i - x_j|}{R_j} \quad (R_j = \text{range}), \quad \text{Categorical: } d_j = 0 \text{ if same, } 1 \text{ if different}$$
+
+$$\text{Overall: } D = \frac{1}{p} \sum_j d_j$$
 
 ---
 
 ## Common Visualisations
 
 ### Scree Plot (PCA)
+
 Shows proportion of variance explained by each principal component. Used to select number of components.
+
 ```python
 plt.plot(range(1, len(pca.explained_variance_ratio_)+1), 
          pca.explained_variance_ratio_, 'o-')
+
 ```
 
 ### Cluster Scatterplots
+
 Used to inspect group separation after clustering or PCA projection.
+
 ```python
 sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=clusters, palette='Set2')
+
 ```
 
 ### Dendrogram
+
 Visualises hierarchical cluster structure; useful for choosing cluster count.
+
 ```python
 dendrogram(linkage_matrix)
+
 ```
 
 ### Elbow Plot
+
 Used to determine optimal K in K-means by plotting WCSS against K.
 
 ### Cluster Centroid Profiles
+
 Plot cluster means for each variable to interpret and name clusters meaningfully.
 
 ---
@@ -419,11 +430,11 @@ Plot cluster means for each variable to interpret and name clusters meaningfully
 
 Unsupervised learning is widely used in production systems:
 
-- **Customer Segmentation:** Group customers based on behaviour, spending, and engagement patterns.
-- **Fraud / Anomaly Detection:** Detect unusual behaviour without labelled examples of fraud.
-- **Recommendation Systems:** Identify similar users and similar products.
-- **Data Compression:** PCA reduces dimensions before modelling, speeding computation and reducing noise.
-- **Feature Engineering:** Cluster labels and PCA components can become new predictive features for supervised models.
+* **Customer Segmentation:** Group customers based on behaviour, spending, and engagement patterns.
+* **Fraud / Anomaly Detection:** Detect unusual behaviour without labelled examples of fraud.
+* **Recommendation Systems:** Identify similar users and similar products.
+* **Data Compression:** PCA reduces dimensions before modelling, speeding computation and reducing noise.
+* **Feature Engineering:** Cluster labels and PCA components can become new predictive features for supervised models.
 
 ---
 
@@ -455,37 +466,36 @@ Unsupervised learning is widely used in production systems:
 
 ## Connections to Other Chapters
 
-- **Chapter 1:** EDA tools (boxplots, histograms) help visualise clusters and PCA results; correlation matrices inform PCA interpretation.
-- **Chapter 2:** Bootstrap methods can assess cluster stability; sampling distributions underpin model-based clustering inference.
-- **Chapter 4:** PCA is the unsupervised analog of regression — both find linear combinations, but PCA has no outcome variable.
-- **Chapter 5:** Cluster assignments can serve as features in classification models.
-- **Chapter 6:** Random forests provide variable importance that can guide feature selection before clustering; KNN uses similar distance metrics.
+* **Chapter 1:** EDA tools (boxplots, histograms) help visualise clusters and PCA results; correlation matrices inform PCA interpretation.
+* **Chapter 2:** Bootstrap methods can assess cluster stability; sampling distributions underpin model-based clustering inference.
+* **Chapter 4:** PCA is the unsupervised analog of regression — both find linear combinations, but PCA has no outcome variable.
+* **Chapter 5:** Cluster assignments can serve as features in classification models.
+* **Chapter 6:** Random forests provide variable importance that can guide feature selection before clustering; KNN uses similar distance metrics.
 
 ---
 
 ## Progress Checklist
 
-- [ ] Read complete chapter (pp. 283–326)
-- [ ] Apply PCA to numeric dataset; plot scree plot and interpret top loadings
-- [ ] Implement K-means with standardised data; use elbow method to select K
-- [ ] Perform hierarchical clustering; interpret dendrogram and cut at meaningful height
-- [ ] Fit Gaussian mixture model; compare BIC across K and covariance types
-- [ ] Handle mixed numeric/categorical data using Gower's distance
-- [ ] Evaluate cluster quality using silhouette score and domain validation
-- [ ] Use cluster assignments as features in a downstream supervised model
-- [ ] Complete `07_unsupervised_learning.ipynb`
-- [ ] Solve all exercises in `exercises.ipynb`
-- [ ] Experiment with different scaling methods and linkage criteria in `experiments.ipynb`
+* [ ] Read complete chapter (pp. 283–326)
+* [ ] Apply PCA to numeric dataset; plot scree plot and interpret top loadings
+* [ ] Implement K-means with standardised data; use elbow method to select K
+* [ ] Perform hierarchical clustering; interpret dendrogram and cut at meaningful height
+* [ ] Fit Gaussian mixture model; compare BIC across K and covariance types
+* [ ] Handle mixed numeric/categorical data using Gower's distance
+* [ ] Evaluate cluster quality using silhouette score and domain validation
+* [ ] Use cluster assignments as features in a downstream supervised model
+* [ ] Complete `07_unsupervised_learning.ipynb`
+* [ ] Solve all exercises in `exercises.ipynb`
+* [ ] Experiment with different scaling methods and linkage criteria in `experiments.ipynb`
 
 ---
 
-
 ### Questions I Still Have
-- When should I prefer hierarchical clustering over K-means for interpretability vs. scalability?
-- How can I validate that discovered clusters are stable and not artifacts of random initialisation?
-- What's the best practice for handling high-cardinality categorical variables in clustering?
-- How do I decide whether to use PCA for dimensionality reduction vs. letting tree-based models handle feature selection?
-- When is model-based clustering worth the computational cost over heuristic methods?
 
+* When should I prefer hierarchical clustering over K-means for interpretability vs. scalability?
+* How can I validate that discovered clusters are stable and not artifacts of random initialisation?
+* What's the best practice for handling high-cardinality categorical variables in clustering?
+* How do I decide whether to use PCA for dimensionality reduction vs. letting tree-based models handle feature selection?
+* When is model-based clustering worth the computational cost over heuristic methods?
 
 ---
